@@ -1,10 +1,49 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_validator/email_validator.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:parkwatch_app/auth_screen/reg_screen.dart';
-// import 'package:parkwatch_app/auth_screen/login_screen.dart'; // Uncomment and replace with actual path
+import 'package:parkwatch_app/dashboard/dashboard.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  Future<void> googleSignUp() async {
+    final GoogleSignIn _googleSignIn = GoogleSignIn();
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser != null) {
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+          accessToken: googleAuth.accessToken,
+        );
+        await FirebaseAuth.instance.signInWithCredential(credential);
+
+        // Navigate to DashboardScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DashboardScreen(),
+          ),
+        );
+      } else {
+        print('Google sign-in was cancelled by the user.');
+      }
+    } catch (e) {
+      print('Error with Google Sign-In: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error signing in with Google: $e'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,9 +129,7 @@ class SignUpScreen extends StatelessWidget {
                       children: [
                         IconButton(
                           icon: Image.asset('assets/google_icon.png'), // Google icon from assets
-                          onPressed: () {
-                            // Handle Google sign up
-                          },
+                          onPressed: googleSignUp,
                         ),
                         IconButton(
                           icon: Image.asset('assets/facebook_icon.png'), // Facebook icon from assets
@@ -107,11 +144,6 @@ class SignUpScreen extends StatelessWidget {
                       onPressed: () {
                         // Navigate back to the login screen
                         Navigator.pop(context);
-                        // Alternatively, use Navigator.push if LoginScreen is separate
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(builder: (context) => LoginScreen()),
-                        // );
                       },
                       child: Text(
                         'Already have an account? Log In',

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:awesome_dialog/awesome_dialog.dart'; // Import awesome_dialog
+import 'package:parkwatch_app/auth_screen/login_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
   final String email; // Receive the email as a parameter
@@ -15,11 +19,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   // Controllers for the password fields
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _contactNumberController = TextEditingController();
 
   @override
   void dispose() {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _addressController.dispose();
+    _contactNumberController.dispose();
     super.dispose();
   }
 
@@ -39,12 +51,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               child: Text('No'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop(); // Close the dialog
-                // Proceed with account creation logic
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Processing Data')),
-                );
+                if (_formKey.currentState?.validate() ?? false) {
+                  await _register();
+                }
               },
               child: Text('Yes'),
             ),
@@ -52,6 +63,78 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         );
       },
     );
+  }
+
+  Future<void> _register() async {
+    final email = widget.email;
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final address = _addressController.text.trim();
+    final contactNumber = _contactNumberController.text.trim();
+
+    if (password != confirmPassword) {
+      _showAlert(
+        dialogType: DialogType.error,
+        title: 'Error',
+        desc: 'Passwords do not match',
+      );
+      return;
+    }
+
+    try {
+      // Create user with email and password
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Get user ID
+      String userId = userCredential.user!.uid;
+
+      // Store additional details in Firestore
+      await FirebaseFirestore.instance.collection('users').doc(userId).set({
+        'firstName': firstName,
+        'lastName': lastName,
+        'address': address,
+        'contactNumber': contactNumber,
+      });
+
+      _showAlert(
+        dialogType: DialogType.success,
+        title: 'Success',
+        desc: 'Account created successfully',
+      );
+
+      // Navigate to login screen after a short delay
+      Future.delayed(Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      });
+    } catch (e) {
+      _showAlert(
+        dialogType: DialogType.error,
+        title: 'Error',
+        desc: 'Error signing up: $e',
+      );
+    }
+  }
+
+  // Method to show alert
+  void _showAlert({required DialogType dialogType, required String title, required String desc}) {
+    AwesomeDialog(
+      context: context,
+      dialogType: dialogType,
+      headerAnimationLoop: false,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+      btnOkColor: Colors.blue,  // Customize button color
+      btnCancelColor: Colors.red, // Customize button color
+    ).show();
   }
 
   @override
@@ -97,6 +180,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         children: [
                           Expanded(
                             child: TextFormField(
+                              controller: _firstNameController,
                               style: TextStyle(color: Colors.black), // Set text color to black
                               decoration: InputDecoration(
                                 filled: true,
@@ -118,6 +202,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           SizedBox(width: 10),
                           Expanded(
                             child: TextFormField(
+                              controller: _lastNameController,
                               style: TextStyle(color: Colors.black), // Set text color to black
                               decoration: InputDecoration(
                                 filled: true,
@@ -155,6 +240,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       ),
                       SizedBox(height: 20),
                       TextFormField(
+                        controller: _addressController,
                         style: TextStyle(color: Colors.black), // Set text color to black
                         decoration: InputDecoration(
                           filled: true,
@@ -174,6 +260,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       ),
                       SizedBox(height: 20),
                       TextFormField(
+                        controller: _contactNumberController,
                         style: TextStyle(color: Colors.black), // Set text color to black
                         decoration: InputDecoration(
                           filled: true,

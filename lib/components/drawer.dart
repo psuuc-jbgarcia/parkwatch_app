@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:parkwatch_app/auth_screen/login_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -26,57 +31,71 @@ class CustomDrawer extends StatelessWidget {
                     fontSize: 18,
                   ),
                 ),
-                Text(
-                  'example@example.com',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                  ),
-                ),
+               
               ],
             ),
           ),
+      
+          Divider(),
           ListTile(
-            leading: Icon(Icons.home),
-            title: Text('Home'),
+            leading: Icon(Icons.description),
+            title: Text('Terms and Conditions'),
             onTap: () {
-              // Navigate to Home
+              // Navigate to Terms and Conditions
               Navigator.pop(context);
             },
           ),
           ListTile(
-            leading: Icon(Icons.map),
-            title: Text('Parking Map'),
+            leading: Icon(Icons.privacy_tip),
+            title: Text('Privacy Policy'),
             onTap: () {
-              // Navigate to Parking Map
+              // Navigate to Privacy Policy
               Navigator.pop(context);
             },
           ),
           ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Profile'),
+            leading: Icon(Icons.contact_mail),
+            title: Text('Contact Us'),
             onTap: () {
-              // Navigate to Profile
+              // Navigate to Contact Us
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.help),
+            title: Text('FAQs'),
+            onTap: () {
+              // Navigate to FAQs
               Navigator.pop(context);
             },
           ),
           Divider(),
-          ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Settings'),
-            onTap: () {
-              // Navigate to Settings
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Logout'),
-            onTap: () {
-              // Handle Logout
-              Navigator.pop(context);
-            },
-          ),
+        ListTile(
+  leading: Icon(Icons.logout),
+  title: Text('Log out'),
+  onTap: () async {
+    try {
+      // Sign out from Firebase
+      await FirebaseAuth.instance.signOut();
+
+      // Sign out from Google
+      await GoogleSignIn().signOut();
+
+      // Navigate to the login screen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) =>LoginScreen()), // Replace with your actual login screen
+      );
+    } catch (e) {
+      print('Error logging out: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error logging out: $e'),
+        ),
+      );
+    }
+  },
+),
+
         ],
       ),
     );

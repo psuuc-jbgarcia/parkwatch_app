@@ -1,30 +1,28 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:parkwatch_app/firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parkwatch_app/auth_screen/login_screen.dart';
 import 'package:parkwatch_app/auth_screen/signup_screen.dart';
-import 'package:parkwatch_app/parking_info/parking_screen.dart';
 
-void main() {
+
+// ...
+
+
+void main()async {
   runApp(ParkingApp());
+    WidgetsFlutterBinding.ensureInitialized(); // Ensure that Flutter binding is initialized
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+);
 }
 
-class MyAPP extends StatelessWidget {
-  const MyAPP({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: ParkingInfoWidget(),
-      ),
-    );
-  }
-}
 
 class ParkingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'ParkWatch',
       theme: ThemeData(
         primarySwatch: Colors.blue,

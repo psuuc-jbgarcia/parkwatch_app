@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "58512380042",
+    "project_id": "parkwatch-4edfa",
+    "storage_bucket": "parkwatch-4edfa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:58512380042:android:56546c4d3c501f59fb1d73",
+        "android_client_info": {
+          "package_name": "com.example.parkwatch_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4i5iDHKo5tU7W1RxeGT3gxpDf9bDl9sg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
