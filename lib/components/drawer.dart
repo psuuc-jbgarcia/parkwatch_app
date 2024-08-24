@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:parkwatch_app/auth_screen/login_screen.dart';
+import 'package:parkwatch_app/dashboard/map.dart';
 
 class CustomDrawer extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -37,6 +38,13 @@ class CustomDrawer extends StatelessWidget {
           ),
       
           Divider(),
+          ListTile(
+            leading: Icon(Icons.map),
+            title: Text('Parking Map'),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_)=>MapScreen()));
+            },
+          ),
           ListTile(
             leading: Icon(Icons.description),
             title: Text('Terms and Conditions'),

@@ -6,7 +6,9 @@
         android:icon="@mipmap/ic_launcher"
         android:hardwareAccelerated="true"
         android:networkSecurityConfig="@xml/network_security_config">
-        
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBhNY6jcmGGM5Cn5iy8_livDZfXfMNm17g" />
 
         
         <activity
