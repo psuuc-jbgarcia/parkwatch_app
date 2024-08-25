@@ -3,6 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:parkwatch_app/auth_screen/login_screen.dart';
 import 'package:parkwatch_app/dashboard/map.dart';
+import 'package:parkwatch_app/other_screen/contact.dart';
+import 'package:parkwatch_app/other_screen/faq.dart';
+import 'package:parkwatch_app/other_screen/privacy.dart';
+import 'package:parkwatch_app/other_screen/terms.dart';
+import 'package:parkwatch_app/other_screen/terms.dart';
 
 class CustomDrawer extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -36,7 +41,6 @@ class CustomDrawer extends StatelessWidget {
               ],
             ),
           ),
-      
           Divider(),
           ListTile(
             leading: Icon(Icons.map),
@@ -49,16 +53,15 @@ class CustomDrawer extends StatelessWidget {
             leading: Icon(Icons.description),
             title: Text('Terms and Conditions'),
             onTap: () {
-              // Navigate to Terms and Conditions
-              Navigator.pop(context);
+                         Navigator.push(context, MaterialPageRoute(builder: (_)=>TermsAndConditionsScreen()));
+
             },
           ),
           ListTile(
             leading: Icon(Icons.privacy_tip),
             title: Text('Privacy Policy'),
             onTap: () {
-              // Navigate to Privacy Policy
-              Navigator.pop(context);
+                         Navigator.push(context, MaterialPageRoute(builder: (_)=>PrivacyPolicyScreen()));
             },
           ),
           ListTile(
@@ -66,7 +69,7 @@ class CustomDrawer extends StatelessWidget {
             title: Text('Contact Us'),
             onTap: () {
               // Navigate to Contact Us
-              Navigator.pop(context);
+                         Navigator.push(context, MaterialPageRoute(builder: (_)=>ContactUsScreen()));
             },
           ),
           ListTile(
@@ -74,7 +77,7 @@ class CustomDrawer extends StatelessWidget {
             title: Text('FAQs'),
             onTap: () {
               // Navigate to FAQs
-              Navigator.pop(context);
+                         Navigator.push(context, MaterialPageRoute(builder: (_)=>AboutAppScreen()));
             },
           ),
           Divider(),

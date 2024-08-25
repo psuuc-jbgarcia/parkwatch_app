@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:parkwatch_app/parking_info/parking_service.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class ParkingInfoWidget extends StatefulWidget {
+class Parking_InfoWidget extends StatefulWidget {
   @override
   _ParkingInfoWidgetState createState() => _ParkingInfoWidgetState();
 }
 
-class _ParkingInfoWidgetState extends State<ParkingInfoWidget> {
+class _ParkingInfoWidgetState extends State<Parking_InfoWidget> {
   final ParkingService _parkingService = ParkingService();
   Map<String, dynamic> _parkingInfo = {};
   Timer? _timer;

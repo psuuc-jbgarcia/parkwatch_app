@@ -4,6 +4,7 @@ import 'package:flutter_email_validator/email_validator.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:parkwatch_app/auth_screen/reg_screen.dart';
 import 'package:parkwatch_app/dashboard/dashboard.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -44,6 +45,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
     }
   }
+
+  Future<void> facebookSignUp() async {
+  try {
+    final LoginResult result = await FacebookAuth.instance.login();
+
+    if (result.status == LoginStatus.success) {
+      final AccessToken accessToken = result.accessToken!;
+
+      // Check for the correct property name
+      final String token = accessToken.tokenString;
+
+      // Create a credential for Firebase authentication
+      final OAuthCredential facebookAuthCredential = FacebookAuthProvider.credential(token);
+
+      // Sign in with the credential
+      await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+
+      // Navigate to the dashboard
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DashboardScreen(),
+        ),
+      );
+    } else if (result.status == LoginStatus.cancelled) {
+      print('Facebook sign-in was cancelled by the user.');
+    } else {
+      print('Facebook sign-in failed: ${result.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error signing in with Facebook: ${result.message}'),
+        ),
+      );
+    }
+  } catch (e) {
+    print('Error with Facebook Sign-In: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error signing in with Facebook: $e'),
+      ),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -133,9 +177,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         IconButton(
                           icon: Image.asset('assets/facebook_icon.png'), // Facebook icon from assets
-                          onPressed: () {
-                            // Handle Facebook sign up
-                          },
+                          onPressed: facebookSignUp,
                         ),
                       ],
                     ),

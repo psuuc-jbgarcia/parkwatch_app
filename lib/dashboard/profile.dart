@@ -78,6 +78,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+                automaticallyImplyLeading: false,
+
         title: Text('Profile'),
         actions: [
           if (!_isEditing && userData != null)
@@ -244,6 +246,7 @@ Future<void> _saveProfile() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+
         title: Text('Complete Your Profile'),
       ),
       body: Padding(
