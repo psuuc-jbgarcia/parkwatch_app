@@ -7,8 +7,9 @@ class ContactUsScreen extends StatelessWidget {
 
   // Function to launch a URL
   Future<void> _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
     } else {
       throw 'Could not launch $url';
     }
@@ -37,7 +38,7 @@ class ContactUsScreen extends StatelessWidget {
                   SizedBox(width: 10),
                   Text(
                     'ParkWatch Features',
-                    style: Theme.of(context).textTheme.headline6?.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: mainColor,
                           fontWeight: FontWeight.bold,
                         ),
@@ -47,33 +48,33 @@ class ContactUsScreen extends StatelessWidget {
               SizedBox(height: 16),
               Text(
                 'ParkWatch offers a range of services designed to improve parking management and enhance user experience. Our real-time surveillance and parking management system provides the following key features:',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               SizedBox(height: 16),
               Text(
                 '• Parking Space Availability: Get real-time information on available parking spaces in your vicinity.',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               Text(
                 '• Vehicle Counting: View current vehicle counts in monitored parking areas.',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               Text(
                 '• Customizable Alerts: Receive notifications about critical occupancy levels and other important updates.',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               Text(
                 '• Analytical Reports: Access detailed reports and analytics on parking trends and usage patterns.',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               Text(
                 '• Interactive Parking Map: Use our intuitive map to find and navigate to available parking spaces.',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               SizedBox(height: 16),
               Text(
                 'These features help reduce the time spent searching for parking, improve traffic flow, and enhance overall parking efficiency.',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               SizedBox(height: 32),
               Row(
@@ -82,7 +83,7 @@ class ContactUsScreen extends StatelessWidget {
                   SizedBox(width: 10),
                   Text(
                     'Contact Us',
-                    style: Theme.of(context).textTheme.headline6?.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: mainColor,
                           fontWeight: FontWeight.bold,
                         ),
@@ -92,14 +93,14 @@ class ContactUsScreen extends StatelessWidget {
               SizedBox(height: 16),
               Text(
                 'We are here to help with any questions or concerns you may have about ParkWatch. You can reach us through the following methods:',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               SizedBox(height: 16),
               GestureDetector(
                 onTap: () => _launchURL('mailto:garciajerico217@gmail.com'),
                 child: Text(
                   'Email: support@parkwatch.com',
-                  style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.blue,
                         decoration: TextDecoration.underline,
                       ),
@@ -109,7 +110,7 @@ class ContactUsScreen extends StatelessWidget {
                 onTap: () => _launchURL('tel:+1234567890'),
                 child: Text(
                   'Phone: (123) 456-7890',
-                  style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.blue,
                         decoration: TextDecoration.underline,
                       ),
@@ -117,12 +118,12 @@ class ContactUsScreen extends StatelessWidget {
               ),
               Text(
                 'Address: Sta. Barbara, Pangasinan',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               SizedBox(height: 16),
               Text(
                 'Feel free to get in touch with us, and we will be happy to assist you.',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
           ),

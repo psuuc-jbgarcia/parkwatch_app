@@ -18,29 +18,33 @@ class CustomDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: Color(0xFF1759BD),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage('assets/profile.jpg'), // Add a profile image here
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Your Name',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                ),
-               
-              ],
+DrawerHeader(
+  decoration: BoxDecoration(
+    color: Color(0xFF1759BD),
+  ),
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Expanded(
+        child: Container(
+          width: double.infinity, // Makes the container full width
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/logo.png'), // Add your logo image here
+              fit: BoxFit.cover, // Ensures the image covers the container
             ),
           ),
+        ),
+      ),
+ 
+    ],
+  ),
+),
+
+
+
+
           Divider(),
           ListTile(
             leading: Icon(Icons.map),

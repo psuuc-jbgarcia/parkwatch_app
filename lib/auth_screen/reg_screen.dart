@@ -64,64 +64,67 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       },
     );
   }
+Future<void> _register() async {
+  final email = widget.email;
+  final password = _passwordController.text.trim();
+  final confirmPassword = _confirmPasswordController.text.trim();
+  final firstName = _firstNameController.text.trim();
+  final lastName = _lastNameController.text.trim();
+  final address = _addressController.text.trim();
+  final contactNumber = _contactNumberController.text.trim();
 
-  Future<void> _register() async {
-    final email = widget.email;
-    final password = _passwordController.text.trim();
-    final confirmPassword = _confirmPasswordController.text.trim();
-    final firstName = _firstNameController.text.trim();
-    final lastName = _lastNameController.text.trim();
-    final address = _addressController.text.trim();
-    final contactNumber = _contactNumberController.text.trim();
-
-    if (password != confirmPassword) {
-      _showAlert(
-        dialogType: DialogType.error,
-        title: 'Error',
-        desc: 'Passwords do not match',
-      );
-      return;
-    }
-
-    try {
-      // Create user with email and password
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      // Get user ID
-      String userId = userCredential.user!.uid;
-
-      // Store additional details in Firestore
-      await FirebaseFirestore.instance.collection('users').doc(userId).set({
-        'firstName': firstName,
-        'lastName': lastName,
-        'address': address,
-        'contactNumber': contactNumber,
-      });
-
-      _showAlert(
-        dialogType: DialogType.success,
-        title: 'Success',
-        desc: 'Account created successfully',
-      );
-
-      // Navigate to login screen after a short delay
-      Future.delayed(Duration(seconds: 2), () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-        );
-      });
-    } catch (e) {
-      _showAlert(
-        dialogType: DialogType.error,
-        title: 'Error',
-        desc: 'Error signing up: $e',
-      );
-    }
+  if (password != confirmPassword) {
+    _showAlert(
+      dialogType: DialogType.error,
+      title: 'Error',
+      desc: 'Passwords do not match',
+    );
+    return;
   }
+
+  try {
+    // Create user with email and password
+    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    // Get user ID
+    String userId = userCredential.user!.uid;
+
+    // Create the displayName by concatenating first and last names
+    String displayName = '$firstName $lastName';
+
+    // Store additional details in Firestore
+    await FirebaseFirestore.instance.collection('users').doc(userId).set({
+      'firstName': firstName,
+      'lastName': lastName,
+      'address': address,
+      'contactNumber': contactNumber,
+      'displayName': displayName, // Add displayName field
+    });
+
+    _showAlert(
+      dialogType: DialogType.success,
+      title: 'Success',
+      desc: 'Account created successfully',
+    );
+
+    // Navigate to login screen after a short delay
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    });
+  } catch (e) {
+    _showAlert(
+      dialogType: DialogType.error,
+      title: 'Error',
+      desc: 'Error signing up: $e',
+    );
+  }
+}
 
   // Method to show alert
   void _showAlert({required DialogType dialogType, required String title, required String desc}) {

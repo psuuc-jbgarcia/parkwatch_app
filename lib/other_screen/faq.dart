@@ -22,7 +22,7 @@ class AboutAppScreen extends StatelessWidget {
             children: [
               Text(
                 'About ParkWatch',
-                style: Theme.of(context).textTheme.headline6?.copyWith(
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: mainColor,
                       fontWeight: FontWeight.bold,
                     ),
@@ -30,10 +30,8 @@ class AboutAppScreen extends StatelessWidget {
               SizedBox(height: 16),
               Text(
                 'ParkWatch is an advanced parking management app that simplifies finding and managing parking spaces. It offers real-time data on parking availability, vehicle counts, and customizable alerts. With a user-friendly interface and interactive map, ParkWatch helps users quickly locate available parking spots and provides detailed reports to aid city planners and parking authorities.',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
-            
-              
             ],
           ),
         ),
