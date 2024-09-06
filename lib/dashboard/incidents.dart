@@ -100,9 +100,13 @@ class _ParkingIncidentsReportsState extends State<ParkingIncidentsReports> {
                 _commentControllers[incident.id] = TextEditingController();
               }
 
-              final timestamp = data['timestamp'] as Timestamp?;
+              final timestamp = data['timestamp'];
               final formattedTimestamp = timestamp != null
-                  ? timeago.format(timestamp.toDate())
+                  ? (timestamp is Timestamp
+                      ? timeago.format(timestamp.toDate())
+                      : (timestamp is String
+                          ? timeago.format(DateTime.parse(timestamp))
+                          : 'Invalid Timestamp'))
                   : 'No Timestamp';
 
               return Card(
@@ -158,10 +162,14 @@ class _ParkingIncidentsReportsState extends State<ParkingIncidentsReports> {
                             children: comments.map((commentDoc) {
                               final commentData = commentDoc.data() as Map<String, dynamic>;
                               final commentText = commentData['text'] ?? 'No Comment';
-                              final commentTimestamp = commentData['timestamp'] as Timestamp?;
+                              final commentTimestamp = commentData['timestamp'];
                               final userName = commentData['userName'] ?? 'Anonymous';
                               final formattedCommentTimestamp = commentTimestamp != null
-                                  ? timeago.format(commentTimestamp.toDate())
+                                  ? (commentTimestamp is Timestamp
+                                      ? timeago.format(commentTimestamp.toDate())
+                                      : (commentTimestamp is String
+                                          ? timeago.format(DateTime.parse(commentTimestamp))
+                                          : 'Invalid Timestamp'))
                                   : 'No Timestamp';
 
                               return Container(
