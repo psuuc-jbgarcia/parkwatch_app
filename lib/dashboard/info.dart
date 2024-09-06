@@ -146,95 +146,6 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget> {
   }
 }
 
-class VideoFeed extends StatefulWidget {
-  final int cameraId;
-
-  VideoFeed({required this.cameraId});
-
-  @override
-  _VideoFeedState createState() => _VideoFeedState();
-}
-
-class _VideoFeedState extends State<VideoFeed> {
-  late WebViewController _controller;
-  bool _hasError = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {},
-          onPageStarted: (String url) {},
-          onPageFinished: (String url) {},
-          onHttpError: (HttpResponseError error) {
-            setState(() {
-              _hasError = true;
-            });
-          },
-          onWebResourceError: (WebResourceError error) {
-            setState(() {
-              _hasError = true;
-            });
-          },
-          onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('http://10.0.2.2:5000/video_feed_flutter/1')) {
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse('http://10.0.2.2:5000/video_feed_flutter/${widget.cameraId}'));
-  }
-
-  void _reloadVideo() {
-    setState(() {
-      _hasError = false;
-    });
-    _controller.loadRequest(Uri.parse('http://10.0.2.2:5000/video_feed_flutter/${widget.cameraId}'));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-                automaticallyImplyLeading: false,
-
-        title: Text('Camera Feed ${widget.cameraId}'),
-      ),
-      body: _hasError
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Error loading video feed',
-                    style: TextStyle(color: Colors.red, fontSize: 18),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _reloadVideo,
-                    child: Text('Retry'),
-                  ),
-                ],
-              ),
-            )
-          : WebViewWidget(controller: _controller),
-      floatingActionButton: _hasError
-          ? null
-          : FloatingActionButton(
-              onPressed: _reloadVideo,
-              child: Icon(Icons.refresh),
-              tooltip: 'Reload Video',
-            ),
-    );
-  }
-}
-
 // class VideoFeed extends StatefulWidget {
 //   final int cameraId;
 
@@ -270,21 +181,21 @@ class _VideoFeedState extends State<VideoFeed> {
 //             });
 //           },
 //           onNavigationRequest: (NavigationRequest request) {
-//             if (request.url.startsWith('http://192.168.100.132:5000/video_feed_flutter/1')) {
+//             if (request.url.startsWith('http://10.0.2.2:5000/video_feed_flutter/1')) {
 //               return NavigationDecision.prevent;
 //             }
 //             return NavigationDecision.navigate;
 //           },
 //         ),
 //       )
-//       ..loadRequest(Uri.parse('http://192.168.100.132:5000/video_feed_flutter/${widget.cameraId}'));
+//       ..loadRequest(Uri.parse('http://10.0.2.2:5000/video_feed_flutter/${widget.cameraId}'));
 //   }
 
 //   void _reloadVideo() {
 //     setState(() {
 //       _hasError = false;
 //     });
-//     _controller.loadRequest(Uri.parse('http://192.168.100.132:5000/video_feed_flutter/${widget.cameraId}'));
+//     _controller.loadRequest(Uri.parse('http://10.0.2.2:5000/video_feed_flutter/${widget.cameraId}'));
 //   }
 
 //   @override
@@ -323,4 +234,93 @@ class _VideoFeedState extends State<VideoFeed> {
 //     );
 //   }
 // }
+
+class VideoFeed extends StatefulWidget {
+  final int cameraId;
+
+  VideoFeed({required this.cameraId});
+
+  @override
+  _VideoFeedState createState() => _VideoFeedState();
+}
+
+class _VideoFeedState extends State<VideoFeed> {
+  late WebViewController _controller;
+  bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (int progress) {},
+          onPageStarted: (String url) {},
+          onPageFinished: (String url) {},
+          onHttpError: (HttpResponseError error) {
+            setState(() {
+              _hasError = true;
+            });
+          },
+          onWebResourceError: (WebResourceError error) {
+            setState(() {
+              _hasError = true;
+            });
+          },
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith('http://192.168.100.170:5000/video_feed_flutter/1')) {
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse('http://192.168.100.170:5000/video_feed_flutter/${widget.cameraId}'));
+  }
+
+  void _reloadVideo() {
+    setState(() {
+      _hasError = false;
+    });
+    _controller.loadRequest(Uri.parse('http://192.168.100.170.132:5000/video_feed_flutter/${widget.cameraId}'));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+                automaticallyImplyLeading: false,
+
+        title: Text('Camera Feed ${widget.cameraId}'),
+      ),
+      body: _hasError
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Error loading video feed',
+                    style: TextStyle(color: Colors.red, fontSize: 18),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _reloadVideo,
+                    child: Text('Retry'),
+                  ),
+                ],
+              ),
+            )
+          : WebViewWidget(controller: _controller),
+      floatingActionButton: _hasError
+          ? null
+          : FloatingActionButton(
+              onPressed: _reloadVideo,
+              child: Icon(Icons.refresh),
+              tooltip: 'Reload Video',
+            ),
+    );
+  }
+}
 
