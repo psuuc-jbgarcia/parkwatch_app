@@ -1,7 +1,44 @@
+import 'dart:math' as math;
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+
+// Function to decode encoded polyline
+List<LatLng> decodePolyline(String encoded) {
+  List<LatLng> polyline = [];
+  int index = 0;
+  int len = encoded.length;
+  int lat = 0;
+  int lng = 0;
+
+  while (index < len) {
+    int b;
+    int shift = 0;
+    int result = 0;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+    lat += dlat;
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+    lng += dlng;
+    polyline.add(LatLng(
+        (lat / 1E5).toDouble(), (lng / 1E5).toDouble()));
+  }
+  return polyline;
+}
 
 class MapScreen extends StatefulWidget {
   @override
@@ -26,24 +63,21 @@ class _MapScreenState extends State<MapScreen> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled. Handle the case as needed.
+      print('Location services are disabled.');
       return;
     }
 
-    // Check location permissions
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
-        // Permission is denied. Handle the case as needed.
+        print('Location permissions are denied.');
         return;
       }
     }
 
-    // Permissions are granted
     _getUserLocation();
   }
 
@@ -54,10 +88,35 @@ class _MapScreenState extends State<MapScreen> {
         _userLocation = LatLng(position.latitude, position.longitude);
         _addMarker();
         _addPolyline();
+        _updateCamera();
       });
     } catch (e) {
-      // Handle the error when unable to get the location
       print('Error getting location: $e');
+    }
+  }
+
+  // Ensure this method is properly defined in your class open route services
+  Future<List<LatLng>> _getRoutePolyline(LatLng origin, LatLng destination) async {
+    final apiKey = '5b3ce3597851110001cf6248ef01a2eca0c4446bbd6de2a35fafdb93'; // Replace with your ORS API key
+    final url =
+        'https://api.openrouteservice.org/v2/directions/driving-car?api_key=$apiKey&start=${origin.longitude},${origin.latitude}&end=${destination.longitude},${destination.latitude}';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> coordinates = data['features'][0]['geometry']['coordinates'];
+
+      // Decode ORS polyline format to LatLng list
+      final List<LatLng> points = coordinates.map((coord) {
+        return LatLng(coord[1], coord[0]); // Reverse the order from [longitude, latitude] to [latitude, longitude]
+      }).toList();
+
+      print('Decoded points: $points'); // Debugging statement
+      return points;
+    } else {
+      print('Failed to load route: ${response.statusCode}');
+      throw Exception('Failed to load route');
     }
   }
 
@@ -70,7 +129,6 @@ class _MapScreenState extends State<MapScreen> {
             position: _currentLocation,
             infoWindow: InfoWindow(
               title: 'Parking Location',
-              snippet: 'You are here',
             ),
             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           ),
@@ -90,30 +148,50 @@ class _MapScreenState extends State<MapScreen> {
           );
         }
       });
-
-      mapController?.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: _currentLocation,
-            zoom: _zoomLevel,
-          ),
-        ),
-      );
     }
   }
 
-  void _addPolyline() {
+  Future<void> _addPolyline() async {
     if (_userLocation != null) {
-      setState(() {
-        _polylines.add(
-          Polyline(
-            polylineId: PolylineId('route'),
-            points: [_userLocation!, _currentLocation],
-            color: Colors.blue,
-            width: 5,
-          ),
-        );
-      });
+      try {
+        final points = await _getRoutePolyline(_userLocation!, _currentLocation);
+        if (points.isNotEmpty) {
+          setState(() {
+            _polylines.add(
+              Polyline(
+                polylineId: PolylineId('route'),
+                points: points,
+                color: Colors.blue,
+                width: 5,
+              ),
+            );
+            print('Polyline added: $points'); // Debugging statement
+          });
+        } else {
+          print('No points to add to polyline');
+        }
+      } catch (e) {
+        print('Error fetching route: $e');
+      }
+    }
+  }
+
+  void _updateCamera() {
+    if (mapController != null && _userLocation != null) {
+      LatLngBounds bounds = LatLngBounds(
+        southwest: LatLng(
+          math.min(_userLocation!.latitude, _currentLocation.latitude),
+          math.min(_userLocation!.longitude, _currentLocation.longitude),
+        ),
+        northeast: LatLng(
+          math.max(_userLocation!.latitude, _currentLocation.latitude),
+          math.max(_userLocation!.longitude, _currentLocation.longitude),
+        ),
+      );
+
+      mapController?.animateCamera(
+        CameraUpdate.newLatLngBounds(bounds, 50), // Adjust padding as needed
+      );
     }
   }
 
