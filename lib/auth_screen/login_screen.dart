@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:awesome_dialog/awesome_dialog.dart'; // Import awesome_dialog
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:parkwatch_app/auth_screen/forgot_pass.dart';
 import 'package:parkwatch_app/auth_screen/signup_screen.dart';
 import 'package:parkwatch_app/dashboard/dashboard.dart';
 
@@ -87,6 +89,51 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+Future<UserCredential?> signInWithFacebook() async {
+  try {
+    // Trigger the Facebook sign-in flow with requested permissions
+    final LoginResult loginResult = await FacebookAuth.instance.login(permissions: ['email', 'public_profile']);
+
+    // Check if the login was successful
+    if (loginResult.status == LoginStatus.success) {
+      // Extract the access token
+      final AccessToken accessToken = loginResult.accessToken!;
+
+      // Create a Facebook credential with the access token
+      final OAuthCredential facebookAuthCredential = FacebookAuthProvider.credential(accessToken.tokenString);
+
+      // Sign in to Firebase using the Facebook credential
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+
+      // Navigate to DashboardScreen upon successful login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DashboardScreen(), // Navigate to your dashboard or any desired screen
+        ),
+      );
+      
+      return userCredential;
+    } else if (loginResult.status == LoginStatus.cancelled) {
+      // Handle login cancellation by the user
+      print('Facebook login was cancelled.');
+      return null;
+    } else {
+      // Handle login failure
+      print('Facebook login failed: ${loginResult.message}');
+      return null;
+    }
+  } catch (e) {
+    // Handle any errors that occurred during the login process
+    print('Error during Facebook sign-in: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error during Facebook login: $e'),
+      ),
+    );
+    return null;
+  }
+}
 
   void _showAlert({
     required DialogType dialogType,
@@ -178,12 +225,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 10),
+                      SizedBox(height: 10),
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          // Handle forgot password
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                          );
                         },
                         child: Text('Forgot Password?'),
                       ),
@@ -218,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         IconButton(
                           icon: Image.asset('assets/facebook_icon.png'), // Replace with your Facebook icon asset
                           onPressed: () {
-                            // Handle Facebook login
+                          signInWithFacebook();
                           },
                         ),
                       ],

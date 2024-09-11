@@ -48,7 +48,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> facebookSignUp() async {
   try {
-    final LoginResult result = await FacebookAuth.instance.login();
+    final LoginResult result = await FacebookAuth.instance.login(permissions:['email', 'public_profile']);
 
     if (result.status == LoginStatus.success) {
       final AccessToken accessToken = result.accessToken!;
@@ -87,6 +87,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
+}
+//facebook
+Future<UserCredential> signInWithFacebook() async {
+  // Trigger the sign-in flow
+  final LoginResult loginResult = await FacebookAuth.instance.login();
+
+  // Create a credential from the access token
+  final OAuthCredential facebookAuthCredential = FacebookAuthProvider.credential('${loginResult.accessToken?.tokenString}');
+
+  // Once signed in, return the UserCredential
+  return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
 }
 
   @override
@@ -177,7 +188,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         IconButton(
                           icon: Image.asset('assets/facebook_icon.png'), // Facebook icon from assets
-                          onPressed: facebookSignUp,
+                          onPressed:  signInWithFacebook,
                         ),
                       ],
                     ),

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="app_name">Parkwatch</string>
+<string name="facebook_app_id">1033746444793345</string>
+<string name="fb_login_protocol_scheme">fb1033746444793345</string>
+<string name="facebook_client_token">8be716364e43dfd9b4562ae42a994b28</string>
+</resources>

@@ -155,3 +155,9 @@ class OnboardingScreen2 extends StatelessWidget {
     );
   }
 }
+// "C:\Program Files\Java\jdk-xx\bin\keytool" -exportcert -alias androiddebugkey -keystore "C:\Users\Jerico\.android\debug.keystore" | "C:\Program Files\OpenSSL-Win64\bin\openssl" sha1 -binary | "C:\Program Files\OpenSSL-Win64\bin\openssl" base64
+
+
+
+
+

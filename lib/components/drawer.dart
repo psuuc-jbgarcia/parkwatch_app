@@ -48,7 +48,7 @@ DrawerHeader(
           Divider(),
           ListTile(
             leading: Icon(Icons.map),
-            title: Text('Parking Map'),
+            title: Text('Parking Route Map'),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (_)=>MapScreen()));
             },

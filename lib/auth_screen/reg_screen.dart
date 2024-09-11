@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:awesome_dialog/awesome_dialog.dart'; // Import awesome_dialog
 import 'package:parkwatch_app/auth_screen/login_screen.dart';
+import 'package:parkwatch_app/dashboard/dashboard.dart';
 
 class RegistrationScreen extends StatefulWidget {
   final String email; // Receive the email as a parameter
@@ -114,7 +115,7 @@ Future<void> _register() async {
     Future.delayed(Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => DashboardScreen()),
       );
     });
   } catch (e) {
