@@ -10,24 +10,34 @@ class ParkingInfoWidget extends StatefulWidget {
   _ParkingInfoWidgetState createState() => _ParkingInfoWidgetState();
 }
 
-class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProviderStateMixin {
+class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ParkingService _parkingService = ParkingService(); // For Parking Interface 1
   final ParkingService2 _parkingService2 = ParkingService2(); // For Parking Interface 2
   Map<String, dynamic> _parkingInfo = {};
-  Map<String, dynamic> _parkingInfo2 = {};
+  Map<String, dynamic> _parkingInfo2 = {}; // Store ParkingService2 info
   Timer? _timer;
   bool _showParkingInterface2 = false; // Control visibility of Parking Interface 2
-  bool _isLoading = true; // Control loading state
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 1, vsync: this); // Start with one tab
+    _initTabController(); // Initialize the TabController
     _fetchParkingInfo();
     _timer = Timer.periodic(Duration(seconds: 5), (timer) {
       _fetchParkingInfo();
     });
+  }
+
+  void _initTabController() {
+    _tabController = TabController(length: 2, vsync: this); // Keep 2 tabs regardless of condition
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchParkingInfo() async {
@@ -41,25 +51,16 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProvid
         _parkingInfo = info;
         _parkingInfo2 = info2;
 
+        // Get the values of totalVehicles, parkingAvailable, and slotsReserved for Parking Interface 2
         final int totalVehicles2 = info2['totalVehicles'] ?? 0;
         final int parkingAvailable2 = info2['parkingAvailable'] ?? 0;
         final int slotsReserved2 = info2['slotsReserved'] ?? 0;
 
         // Set condition to show Parking Interface 2 if any values are greater than 0
-        bool showParkingInterface2 = totalVehicles2 > 0 || parkingAvailable2 > 0 || slotsReserved2 > 0;
-
-        // Update the TabController only if the visibility changes
-        if (showParkingInterface2 != _showParkingInterface2) {
-          _showParkingInterface2 = showParkingInterface2;
-          _tabController = TabController(length: _showParkingInterface2 ? 2 : 1, vsync: this);
-        }
+        _showParkingInterface2 = totalVehicles2 > 0 || parkingAvailable2 > 0 || slotsReserved2 > 0;
       });
     } catch (e) {
       print('Error fetching parking info: $e');
-    } finally {
-      setState(() {
-        _isLoading = false; // Stop loading when done
-      });
     }
   }
 
@@ -110,16 +111,6 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProvid
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: Text('Parking Info'),
-        ),
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -128,7 +119,7 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProvid
           controller: _tabController,
           tabs: [
             Tab(text: 'Parking Interface'), // Always show Parking Interface
-            if (_showParkingInterface2) Tab(text: 'Parking Interface 2'), // Conditionally show Parking Interface 2
+            Tab(text: _showParkingInterface2 ? 'Parking Interface 2' : 'Unavailable'), // Conditionally show Parking Interface 2 or Unavailable
           ],
         ),
       ),
@@ -182,20 +173,14 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProvid
                   )
                 : CircularProgressIndicator(),
           ),
-          if (_showParkingInterface2)
-            Center(
-              child: ParkingInfoWidget2(),
-            ),
+          Center(
+            child: _showParkingInterface2
+                ? ParkingInfoWidget2() // Show Parking Interface 2 if available
+                : Text('Parking Interface 2 is unavailable'), // Show this if Parking Interface 2 data is all zeros
+          ),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _tabController.dispose();
-    super.dispose();
   }
 }
 

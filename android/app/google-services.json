@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "58512380042",
+    "firebase_url": "https://parkwatch-4edfa-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "parkwatch-4edfa",
     "storage_bucket": "parkwatch-4edfa.appspot.com"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.parkwatch_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "58512380042-0eldu7p6oc62gd3ee69kprmdnd6tfr2t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.parkwatch_app",
+            "certificate_hash": "d0e79408b6864b8de4e3340e05cf89d93038251f"
+          }
+        },
+        {
+          "client_id": "58512380042-eeqam7ju6h5cng9aojch6111l4j8snmt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD4i5iDHKo5tU7W1RxeGT3gxpDf9bDl9sg"
@@ -20,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "58512380042-eeqam7ju6h5cng9aojch6111l4j8snmt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "58512380042-jsds7lg89mt8pedppqloai11jk3bhiqc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.parkwatchApp"
+              }
+            }
+          ]
         }
       }
     }

@@ -188,7 +188,7 @@ Future<UserCredential> signInWithFacebook() async {
                         ),
                         IconButton(
                           icon: Image.asset('assets/facebook_icon.png'), // Facebook icon from assets
-                          onPressed:  signInWithFacebook,
+                          onPressed:   facebookSignUp,
                         ),
                       ],
                     ),

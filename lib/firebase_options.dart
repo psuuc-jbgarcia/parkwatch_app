@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -54,6 +45,7 @@ class DefaultFirebaseOptions {
     appId: '1:58512380042:android:56546c4d3c501f59fb1d73',
     messagingSenderId: '58512380042',
     projectId: 'parkwatch-4edfa',
+    databaseURL: 'https://parkwatch-4edfa-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'parkwatch-4edfa.appspot.com',
   );
 
@@ -62,7 +54,43 @@ class DefaultFirebaseOptions {
     appId: '1:58512380042:ios:0bb4b63fe4f957a6fb1d73',
     messagingSenderId: '58512380042',
     projectId: 'parkwatch-4edfa',
+    databaseURL: 'https://parkwatch-4edfa-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'parkwatch-4edfa.appspot.com',
+    androidClientId: '58512380042-0eldu7p6oc62gd3ee69kprmdnd6tfr2t.apps.googleusercontent.com',
+    iosClientId: '58512380042-jsds7lg89mt8pedppqloai11jk3bhiqc.apps.googleusercontent.com',
     iosBundleId: 'com.example.parkwatchApp',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyBs_wJDz3YlPU_V6zigGNppCsm2YiVnLqo',
+    appId: '1:58512380042:web:012cb291b3952108fb1d73',
+    messagingSenderId: '58512380042',
+    projectId: 'parkwatch-4edfa',
+    authDomain: 'parkwatch-4edfa.firebaseapp.com',
+    databaseURL: 'https://parkwatch-4edfa-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'parkwatch-4edfa.appspot.com',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyB3e_ZxUEQxw69FBfqcfgf_fkFrs283fjs',
+    appId: '1:58512380042:ios:0bb4b63fe4f957a6fb1d73',
+    messagingSenderId: '58512380042',
+    projectId: 'parkwatch-4edfa',
+    databaseURL: 'https://parkwatch-4edfa-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'parkwatch-4edfa.appspot.com',
+    androidClientId: '58512380042-0eldu7p6oc62gd3ee69kprmdnd6tfr2t.apps.googleusercontent.com',
+    iosClientId: '58512380042-jsds7lg89mt8pedppqloai11jk3bhiqc.apps.googleusercontent.com',
+    iosBundleId: 'com.example.parkwatchApp',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyBs_wJDz3YlPU_V6zigGNppCsm2YiVnLqo',
+    appId: '1:58512380042:web:66f1a1d87eb9cb1afb1d73',
+    messagingSenderId: '58512380042',
+    projectId: 'parkwatch-4edfa',
+    authDomain: 'parkwatch-4edfa.firebaseapp.com',
+    databaseURL: 'https://parkwatch-4edfa-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'parkwatch-4edfa.appspot.com',
+  );
+
 }
