@@ -40,8 +40,8 @@ class _ParkingIncidentsReportsState extends State<ParkingIncidentsReports> {
           _currentUserName = firstName.isNotEmpty && lastName.isNotEmpty
               ? '$firstName $lastName'
               : displayName.isNotEmpty
-                  ? displayName
-                  : 'Anonymous';
+              ? displayName
+              : 'Anonymous';
         });
       }
     }
@@ -73,7 +73,10 @@ class _ParkingIncidentsReportsState extends State<ParkingIncidentsReports> {
         title: Text('Parking Incidents'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('admin').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('admin')
+            .orderBy('timestamp', descending: true) // Sort by timestamp in descending order
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -103,10 +106,10 @@ class _ParkingIncidentsReportsState extends State<ParkingIncidentsReports> {
               final timestamp = data['timestamp'];
               final formattedTimestamp = timestamp != null
                   ? (timestamp is Timestamp
-                      ? timeago.format(timestamp.toDate())
-                      : (timestamp is String
-                          ? timeago.format(DateTime.parse(timestamp))
-                          : 'Invalid Timestamp'))
+                  ? timeago.format(timestamp.toDate())
+                  : (timestamp is String
+                  ? timeago.format(DateTime.parse(timestamp))
+                  : 'Invalid Timestamp'))
                   : 'No Timestamp';
 
               return Card(
@@ -134,96 +137,96 @@ class _ParkingIncidentsReportsState extends State<ParkingIncidentsReports> {
                         'Timestamp: $formattedTimestamp',
                         style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
-                      Divider(height: 20, thickness: 1.5),
-                      // Comments
-                      StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('admin')
-                            .doc(incident.id)
-                            .collection('comments')
-                            .orderBy('timestamp')
-                            .snapshots(),
-                        builder: (context, commentsSnapshot) {
-                          if (commentsSnapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          }
+                      // Divider(height: 20, thickness: 1.5),
+                      // // Comments
+                      // StreamBuilder<QuerySnapshot>(
+                      //   stream: FirebaseFirestore.instance
+                      //       .collection('admin')
+                      //       .doc(incident.id)
+                      //       .collection('comments')
+                      //       .orderBy('timestamp')
+                      //       .snapshots(),
+                      //   builder: (context, commentsSnapshot) {
+                      //     if (commentsSnapshot.connectionState == ConnectionState.waiting) {
+                      //       return Center(child: CircularProgressIndicator());
+                      //     }
+                      //
+                      //     if (commentsSnapshot.hasError) {
+                      //       return Center(child: Text('Error: ${commentsSnapshot.error}'));
+                      //     }
+                      //
+                      //     if (!commentsSnapshot.hasData || commentsSnapshot.data!.docs.isEmpty) {
+                      //       return Text('No comments yet.');
+                      //     }
+                      //
+                      //     final comments = commentsSnapshot.data!.docs;
+                      //
+                      //     return Column(
+                      //       children: comments.map((commentDoc) {
+                      //         final commentData = commentDoc.data() as Map<String, dynamic>;
+                      //         final commentText = commentData['text'] ?? 'No Comment';
+                      //         final commentTimestamp = commentData['timestamp'];
+                      //         final userName = commentData['userName'] ?? 'Anonymous';
+                      //         final formattedCommentTimestamp = commentTimestamp != null
+                      //             ? (commentTimestamp is Timestamp
+                      //             ? timeago.format(commentTimestamp.toDate())
+                      //             : (commentTimestamp is String
+                      //             ? timeago.format(DateTime.parse(commentTimestamp))
+                      //             : 'Invalid Timestamp'))
+                      //             : 'No Timestamp';
+                      //
+                      //         return Container(
+                      //           margin: EdgeInsets.symmetric(vertical: 5),
+                      //           padding: EdgeInsets.all(8.0),
+                      //           decoration: BoxDecoration(
+                      //             color: Colors.grey[200],
+                      //             borderRadius: BorderRadius.circular(10),
+                      //           ),
+                      //           child: ListTile(
+                      //             title: Text(
+                      //               commentText,
+                      //               style: TextStyle(fontSize: 16),
+                      //             ),
+                      //             subtitle: Text(
+                      //               'Posted by $userName on $formattedCommentTimestamp',
+                      //               style: TextStyle(color: Colors.grey),
+                      //             ),
+                      //           ),
+                      //         );
+                      //       }).toList(),
+                      //     );
+                      //   },
+                      // ),
 
-                          if (commentsSnapshot.hasError) {
-                            return Center(child: Text('Error: ${commentsSnapshot.error}'));
-                          }
-
-                          if (!commentsSnapshot.hasData || commentsSnapshot.data!.docs.isEmpty) {
-                            return Text('No comments yet.');
-                          }
-
-                          final comments = commentsSnapshot.data!.docs;
-
-                          return Column(
-                            children: comments.map((commentDoc) {
-                              final commentData = commentDoc.data() as Map<String, dynamic>;
-                              final commentText = commentData['text'] ?? 'No Comment';
-                              final commentTimestamp = commentData['timestamp'];
-                              final userName = commentData['userName'] ?? 'Anonymous';
-                              final formattedCommentTimestamp = commentTimestamp != null
-                                  ? (commentTimestamp is Timestamp
-                                      ? timeago.format(commentTimestamp.toDate())
-                                      : (commentTimestamp is String
-                                          ? timeago.format(DateTime.parse(commentTimestamp))
-                                          : 'Invalid Timestamp'))
-                                  : 'No Timestamp';
-
-                              return Container(
-                                margin: EdgeInsets.symmetric(vertical: 5),
-                                padding: EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: ListTile(
-                                  title: Text(
-                                    commentText,
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                  subtitle: Text(
-                                    'Posted by $userName on $formattedCommentTimestamp',
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        },
-                      ),
-
-                      Divider(height: 20, thickness: 1.5),
-                      // Comment Input
-                      Padding(
-                        padding: EdgeInsets.only(top: 10.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: _commentControllers[incident.id],
-                                decoration: InputDecoration(
-                                  labelText: 'Add a comment',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[200],
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.send, color: Color(0xFF1759BD)),
-                              onPressed: () {
-                                final comment = _commentControllers[incident.id]?.text ?? '';
-                                _handleCommentSubmit(incident.id, comment);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Divider(height: 20, thickness: 1.5),
+                      // // Comment Input
+                      // Padding(
+                      //   padding: EdgeInsets.only(top: 10.0),
+                      //   child: Row(
+                      //     children: [
+                      //       Expanded(
+                      //         child: TextField(
+                      //           controller: _commentControllers[incident.id],
+                      //           decoration: InputDecoration(
+                      //             labelText: 'Add a comment',
+                      //             border: OutlineInputBorder(
+                      //               borderRadius: BorderRadius.circular(10),
+                      //             ),
+                      //             filled: true,
+                      //             fillColor: Colors.grey[200],
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       IconButton(
+                      //         icon: Icon(Icons.send, color: Color(0xFF1759BD)),
+                      //         onPressed: () {
+                      //           final comment = _commentControllers[incident.id]?.text ?? '';
+                      //           _handleCommentSubmit(incident.id, comment);
+                      //         },
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

@@ -232,14 +232,14 @@ class _VideoFeedState extends State<VideoFeed> {
           },
         ),
       )
-      ..loadRequest(Uri.parse('http://192.168.100.177:5000/video_feed_flutter/${widget.cameraId}'));
+      ..loadRequest(Uri.parse('http://10.0.2.2:5000/video_feed_flutter/1'));
   }
 
   void _reloadVideo() {
     setState(() {
       _hasError = false;
     });
-    _controller.loadRequest(Uri.parse('http://192.168.100.177:5000/video_feed_flutter/${widget.cameraId}'));
+    _controller.loadRequest(Uri.parse('http://10.0.2.2:5000/video_feed_flutter/1'));
   }
 
   @override

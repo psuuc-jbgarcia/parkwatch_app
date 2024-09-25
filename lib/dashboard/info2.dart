@@ -178,14 +178,14 @@ class _VideoFeedState extends State<VideoFeed> {
             });
           },
           onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('http://192.168.100.177:5000/video_feed/2')) {
+            if (request.url.startsWith('http://10.0.2.2:5000/video_feed/2')) {
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;
           },
         ),
       )
-      ..loadRequest(Uri.parse('http://192.168.100.177:5000/video_feed${widget.cameraId}'));
+      ..loadRequest(Uri.parse('http://10.0.2.2:5000/video_feed/2'));
   }
 
   void _reloadVideo() {
