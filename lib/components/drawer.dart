@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:parkwatch_app/auth_screen/login_screen.dart';
+import 'package:parkwatch_app/components/report_incident_screen.dart';
 import 'package:parkwatch_app/dashboard/map.dart';
 import 'package:parkwatch_app/other_screen/contact.dart';
 import 'package:parkwatch_app/other_screen/faq.dart';
@@ -53,6 +54,13 @@ DrawerHeader(
               Navigator.push(context, MaterialPageRoute(builder: (_)=>MapScreen()));
             },
           ),
+          ListTile(
+  leading: Icon(Icons.report),
+  title: Text('Report an Incident'),
+  onTap: () {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => ReportIncidentScreen()));
+  },
+),
           ListTile(
             leading: Icon(Icons.description),
             title: Text('Terms and Conditions'),
