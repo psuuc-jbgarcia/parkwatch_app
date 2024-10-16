@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:parkwatch_app/auth_screen/login_screen.dart';
-import 'package:parkwatch_app/components/report_incident_screen.dart';
+import 'package:parkwatch_app/dashboard/report_incident_screen.dart';
 import 'package:parkwatch_app/dashboard/map.dart';
 import 'package:parkwatch_app/other_screen/contact.dart';
 import 'package:parkwatch_app/other_screen/faq.dart';
