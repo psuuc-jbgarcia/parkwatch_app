@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:intl/intl.dart'; // Ensure this is included
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 
 class ReportIncidentScreen extends StatefulWidget {
   @override
@@ -15,6 +19,8 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
   bool _isLoading = false;
 
   String? _currentUserName;
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -24,41 +30,59 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
 
   void _getCurrentUser() {
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
+    setState(() {
+      _currentUserName = user?.displayName ?? 'Anonymous';
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
       setState(() {
-        _currentUserName = user.displayName;
-        if (_currentUserName == null || _currentUserName!.isEmpty) {
-          _currentUserName = 'Anonymous';
-        }
-        print('Current User Display Name: $_currentUserName');
+        _selectedImage = File(pickedFile.path);
       });
-    } else {
-      setState(() {
-        _currentUserName = 'Anonymous';
-      });
+    }
+  }
+
+  Future<String?> _uploadImage(File imageFile) async {
+    try {
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final ref = FirebaseStorage.instance.ref().child('incident_images/$fileName');
+      final uploadTask = await ref.putFile(imageFile);
+      return await uploadTask.ref.getDownloadURL();
+    } catch (e) {
+      print('Error uploading image: $e');
+      return null;
     }
   }
 
   Future<void> _submitReport() async {
     if (_formKey.currentState!.validate()) {
+      if (_selectedImage == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please capture an image of the incident.')));
+        return;
+      }
+
       final description = _descriptionController.text;
       setState(() {
         _isLoading = true;
       });
 
       try {
-        print('Submitting report for user: $_currentUserName');
+        String? imageUrl = await _uploadImage(_selectedImage!);
 
-        final now = DateTime.now().toUtc().add(Duration(hours: 8)); // Adjust to Philippine time
+        final now = DateTime.now().toUtc().add(Duration(hours: 8));
         final formattedTimestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
 
         await FirebaseFirestore.instance.collection('userreports').add({
           'name': _currentUserName ?? 'Anonymous',
           'description': description,
-          'timestamp': formattedTimestamp, // Store formatted timestamp as string
+          'image_url': imageUrl ?? '',
+          'timestamp': formattedTimestamp,
         });
 
         _descriptionController.clear();
+        _selectedImage = null;
         _showAlert(
           dialogType: DialogType.success,
           title: 'Success',
@@ -87,8 +111,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
       title: title,
       desc: desc,
       btnOkOnPress: () {},
-      btnOkColor: Color(0xFF1759BD),
-      btnCancelColor: Colors.red,
+      btnOkColor: Color(0xFF007BFF),
     ).show();
   }
 
@@ -96,15 +119,15 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Report Incident'),
+        backgroundColor: Color(0xFF007BFF),
+        title: Text('Report Incident', style: TextStyle(color: Colors.white)),
       ),
-      body: Container(
-        color: Color(0xFFF7F9FC),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Card(
-          elevation: 5,
+          elevation: 4,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(15),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -113,18 +136,49 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'Please describe the incident you want to report:',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                  SizedBox(height: 10),
+           
+                  SizedBox(height: 20),
+                  if (_selectedImage != null)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.file(
+                        _selectedImage!,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  else
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey[400]!),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.camera_alt, size: 50, color: Colors.grey[600]),
+                            SizedBox(height: 10),
+                            Text(
+                              'Tap to Capture Image',
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: 20),
                   TextFormField(
                     controller: _descriptionController,
                     decoration: InputDecoration(
-                      labelText: 'Incident Description',
-                      labelStyle: TextStyle(color: Colors.black54),
+                      labelText: 'Describe the Incident',
+                      labelStyle: TextStyle(color: Colors.grey[700]),
                       border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.description, color: Colors.black54),
+                      prefixIcon: Icon(Icons.description, color: Colors.grey[700]),
                     ),
                     maxLines: 4,
                     validator: (value) {
@@ -138,7 +192,7 @@ class _ReportIncidentScreenState extends State<ReportIncidentScreen> {
                   ElevatedButton(
                     onPressed: _isLoading ? null : _submitReport,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF1759BD),
+                      backgroundColor: Color(0xFF007BFF),
                       padding: EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),

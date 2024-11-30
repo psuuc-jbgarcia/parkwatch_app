@@ -2,7 +2,10 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()  // Ensure this is included as well
+
     }
+
 }
 
 rootProject.buildDir = '../build'

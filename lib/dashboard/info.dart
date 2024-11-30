@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:parkwatch_app/const/const.dart';
 import 'package:parkwatch_app/dashboard/info2.dart'; // Importing the second info file
+import 'package:parkwatch_app/dashboard/parkind_model.dart';
 import 'package:parkwatch_app/parking_info/parking_service.dart';
 import 'package:parkwatch_app/parking_info/parking_service2.dart'; // Importing ParkingService2
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // To decode the JSON response
 
 class ParkingInfoWidget extends StatefulWidget {
   @override
@@ -11,23 +15,30 @@ class ParkingInfoWidget extends StatefulWidget {
 }
 
 class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProviderStateMixin {
+    late PageController _pageController; // Declare the PageController
+
   late TabController _tabController;
   final ParkingService _parkingService = ParkingService(); // For Parking Interface 1
   final ParkingService2 _parkingService2 = ParkingService2(); // For Parking Interface 2
   Map<String, dynamic> _parkingInfo = {};
   Map<String, dynamic> _parkingInfo2 = {};
   Timer? _timer;
+    Timer? model;  // Declare a Timer
+
   bool _showParkingInterface2 = false; // Control visibility of Parking Interface 2
   bool _isLoading = true; // Control loading state
 
   @override
   void initState() {
     super.initState();
+        _pageController = PageController(); // Initialize the PageController
+
     _tabController = TabController(length: 1, vsync: this); // Start with one tab
     _fetchParkingInfo();
     _timer = Timer.periodic(Duration(seconds: 5), (timer) {
       _fetchParkingInfo();
     });
+
   }
 
   Future<void> _fetchParkingInfo() async {
@@ -36,7 +47,7 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProvid
       final info = await _parkingService.getParkingInfo();
       // Fetch parking info for Parking Interface 2
       final info2 = await _parkingService2.getParkingInfo();
-
+if (this.mounted) {
       setState(() {
         _parkingInfo = info;
         _parkingInfo2 = info2;
@@ -53,13 +64,15 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProvid
           _showParkingInterface2 = showParkingInterface2;
           _tabController = TabController(length: _showParkingInterface2 ? 2 : 1, vsync: this);
         }
-      });
+      });}
     } catch (e) {
       print('Error fetching parking info: $e');
     } finally {
+      if (this.mounted) {
       setState(() {
         _isLoading = false; // Stop loading when done
       });
+      }
     }
   }
 
@@ -116,7 +129,11 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProvid
           automaticallyImplyLeading: false,
           title: Text('Parking Info'),
         ),
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: Text("The server is offline",style: 
+        TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold
+        ),)),
       );
     }
 
@@ -173,10 +190,22 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProvid
                             ),
                           ],
                         ),
-                        SizedBox(height: 10),
-                        Expanded(
-                          child: VideoFeed(cameraId: 1),
-                        ),
+                      SizedBox(height: 10),
+
+ // Wrap the PageView in an Expanded widget
+    Expanded(
+      child: PageView(
+        controller: _pageController,
+        children: [
+          VideoFeed(cameraId: 1),
+          ParkingModelImageScreen(),
+        ],
+      ),
+    ),
+
+      SizedBox(width: 10), // Space between video feeds
+ 
+
                       ],
                     ),
                   )
@@ -196,6 +225,8 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget> with TickerProvid
     _timer?.cancel();
     _tabController.dispose();
     super.dispose();
+       _pageController.dispose(); // Dispose of the controller when no longer needed
+
   }
 }
 
@@ -221,25 +252,28 @@ class _VideoFeedState extends State<VideoFeed> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onHttpError: (HttpResponseError error) {
+            if (this.mounted) {
             setState(() {
               _hasError = true;
-            });
+            });}
           },
           onWebResourceError: (WebResourceError error) {
+            if (this.mounted) {
             setState(() {
               _hasError = true;
-            });
+            });}
           },
         ),
       )
-      ..loadRequest(Uri.parse('http://10.0.2.2:5000/video_feed_flutter/1'));
+      ..loadRequest(Uri.parse('$baseUrl/video_feed_flutter/1'));
   }
 
   void _reloadVideo() {
-    setState(() {
+    if (this.mounted) {   setState(() {
       _hasError = false;
-    });
-    _controller.loadRequest(Uri.parse('http://10.0.2.2:5000/video_feed_flutter/1'));
+    });}
+ 
+    _controller.loadRequest(Uri.parse('$baseUrl/video_feed_flutter/1'));
   }
 
   @override
@@ -262,14 +296,8 @@ class _VideoFeedState extends State<VideoFeed> {
                 ],
               ),
             )
-          : WebViewWidget(controller: _controller),
-      floatingActionButton: _hasError
-          ? null
-          : FloatingActionButton(
-              onPressed: _reloadVideo,
-              child: Icon(Icons.refresh),
-              tooltip: 'Reload Video',
-            ),
+  : WebViewWidget(controller: _controller),
+      floatingActionButton: null, // Removed the reload button
     );
   }
 }

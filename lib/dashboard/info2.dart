@@ -2,6 +2,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:parkwatch_app/const/const.dart';
+import 'package:parkwatch_app/dashboard/parkind_model2.dart';
 import 'package:parkwatch_app/parking_info/parking_service2.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -11,12 +13,15 @@ class ParkingInfoWidget2 extends StatefulWidget {
 }
 
 class _ParkingInfoWidgetState extends State<ParkingInfoWidget2> {
+      late PageController _pageController; // Declare the PageController
+
   final ParkingService2 _parkingService = ParkingService2();
   Map<String, dynamic> _parkingInfo = {};
   Timer? _timer;
 
   @override
   void initState() {
+     _pageController = PageController(); // Initialize the PageController
     super.initState();
     _fetchParkingInfo();
     _timer = Timer.periodic(Duration(seconds: 5), (timer) {
@@ -28,6 +33,8 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget2> {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+           _pageController.dispose(); // Dispose of the controller when no longer needed
+
   }
 
   Future<void> _fetchParkingInfo() async {
@@ -129,10 +136,20 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget2> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 10),
-                    Expanded(
-                      child: VideoFeed(cameraId: 2),
-                    ),
+                            SizedBox(height: 10),
+
+ // Wrap the PageView in an Expanded widget
+    Expanded(
+      child: PageView(
+        controller: _pageController,
+        children: [
+          VideoFeed(cameraId: 1),
+          ParkingModelImageScreen(),
+        ],
+      ),
+    ),
+
+      SizedBox(width: 10),
                   ],
                 ),
               )
@@ -178,21 +195,21 @@ class _VideoFeedState extends State<VideoFeed> {
             });
           },
           onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('http://10.0.2.2:5000/video_feed/2')) {
+            if (request.url.startsWith('$baseUrl/video_feed/2')) {
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;
           },
         ),
       )
-      ..loadRequest(Uri.parse('http://10.0.2.2:5000/video_feed/2'));
+      ..loadRequest(Uri.parse('$baseUrl/video_feed/2'));
   }
 
   void _reloadVideo() {
     setState(() {
       _hasError = false;
     });
-    _controller.loadRequest(Uri.parse('http://192.168.100.177:5000/video_feed/${widget.cameraId}'));
+    _controller.loadRequest(Uri.parse('$baseUrl/video_feed/${widget.cameraId}'));
   }
 
   @override

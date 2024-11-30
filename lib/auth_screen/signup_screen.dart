@@ -133,7 +133,7 @@ Future<UserCredential> signInWithFacebook() async {
                   children: [
                     TextFormField(
                       decoration: InputDecoration(
-                        labelText: 'Email or phone number',
+                        labelText: 'Email',
                         prefixIcon: Icon(Icons.email),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
