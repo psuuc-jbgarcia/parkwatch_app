@@ -1,31 +1,30 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:parkwatch_app/const/const.dart';
-import 'package:parkwatch_app/dashboard/parking_model2.dart';
-import 'package:parkwatch_app/parking_info/parking_service2.dart';
+import 'package:parkwatch_app/dashboard/parking_model3.dart';
+import 'package:parkwatch_app/parking_info/parking_service3.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class ParkingInfoWidget2 extends StatefulWidget {
+class ParkingInfoWidget3 extends StatefulWidget {
   @override
-  _ParkingInfoWidgetState createState() => _ParkingInfoWidgetState();
+  _ParkingInfoWidget3State createState() => _ParkingInfoWidget3State();
 }
 
-class _ParkingInfoWidgetState extends State<ParkingInfoWidget2> {
-      late PageController _pageController; // Declare the PageController
+class _ParkingInfoWidget3State extends State<ParkingInfoWidget3> {
+  late PageController _pageController; // Declare the PageController
 
-  final ParkingService2 _parkingService = ParkingService2();
-  Map<String, dynamic> _parkingInfo = {};
+  final ParkingService3 _parkingService = ParkingService3();
+  Map<String, dynamic> _parkingInfo3 = {};
   Timer? _timer;
 
   @override
   void initState() {
-     _pageController = PageController(); // Initialize the PageController
+    _pageController = PageController(); // Initialize the PageController
     super.initState();
-    _fetchParkingInfo();
+    _fetchParkingInfo3();
     _timer = Timer.periodic(Duration(seconds: 5), (timer) {
-      _fetchParkingInfo();
+      _fetchParkingInfo3();
     });
   }
 
@@ -33,15 +32,14 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget2> {
   void dispose() {
     _timer?.cancel();
     super.dispose();
-           _pageController.dispose(); // Dispose of the controller when no longer needed
-
+    _pageController.dispose(); // Dispose of the controller when no longer needed
   }
 
-  Future<void> _fetchParkingInfo() async {
+  Future<void> _fetchParkingInfo3() async {
     try {
       final info = await _parkingService.getParkingInfo();
       setState(() {
-        _parkingInfo = info;
+        _parkingInfo3 = info;
       });
     } catch (e) {
       print('Error fetching parking info: $e');
@@ -96,9 +94,8 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Center(
-        child: _parkingInfo.isNotEmpty
+        child: _parkingInfo3.isNotEmpty
             ? Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
@@ -109,7 +106,7 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget2> {
                         Expanded(
                           child: _buildInfoCard(
                             'Total Vehicles Parked',
-                            _parkingInfo['totalVehicles'] ?? 0,
+                            _parkingInfo3['totalVehicles'] ?? 0,
                             Colors.blue,
                             Icons.directions_car,
                           ),
@@ -117,7 +114,7 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget2> {
                         Expanded(
                           child: _buildInfoCard(
                             'Parking Slot Available',
-                            _parkingInfo['parkingAvailable'] ?? 0,
+                            _parkingInfo3['parkingAvailable'] ?? 0,
                             Colors.green,
                             Icons.local_parking,
                           ),
@@ -129,27 +126,26 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget2> {
                         Expanded(
                           child: _buildInfoCard(
                             'Total Slot Reserved',
-                            _parkingInfo['slotsReserved'] ?? 0,
+                            _parkingInfo3['slotsReserved'] ?? 0,
                             Colors.orange,
                             Icons.event_seat,
                           ),
                         ),
                       ],
                     ),
-                            SizedBox(height: 10),
+                    SizedBox(height: 10),
 
- // Wrap the PageView in an Expanded widget
-    Expanded(
-      child: PageView(
-        controller: _pageController,
-        children: [
-          VideoFeed(cameraId: 2),
-          ParkingModelImageScreen(),
-        ],
-      ),
-    ),
-
-      SizedBox(width: 10),
+                    // Wrap the PageView in an Expanded widget
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        children: [
+                          VideoFeed3(cameraId: 3),
+                          ParkingModelImageScreen3(),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 10),
                   ],
                 ),
               )
@@ -159,17 +155,16 @@ class _ParkingInfoWidgetState extends State<ParkingInfoWidget2> {
   }
 }
 
-
-class VideoFeed extends StatefulWidget {
+class VideoFeed3 extends StatefulWidget {
   final int cameraId;
 
-  VideoFeed({required this.cameraId});
+  VideoFeed3({required this.cameraId});
 
   @override
-  _VideoFeedState createState() => _VideoFeedState();
+  _VideoFeed3State createState() => _VideoFeed3State();
 }
 
-class _VideoFeedState extends State<VideoFeed> {
+class _VideoFeed3State extends State<VideoFeed3> {
   late WebViewController _controller;
   bool _hasError = false;
 
@@ -195,14 +190,14 @@ class _VideoFeedState extends State<VideoFeed> {
             });
           },
           onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('$baseUrl/video_feed/2')) {
+            if (request.url.startsWith('$baseUrl/video_feed/3')) {
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;
           },
         ),
       )
-      ..loadRequest(Uri.parse('$baseUrl/video_feed/2'));
+      ..loadRequest(Uri.parse('$baseUrl/video_feed/3'));
   }
 
   void _reloadVideo() {
@@ -215,7 +210,6 @@ class _VideoFeedState extends State<VideoFeed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-   
       body: _hasError
           ? Center(
               child: Column(
